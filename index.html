@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Organization Map</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #020611;
+      color: white;
+    }
+
+    #globeViz {
+      width: 100%;
+      height: 100%;
+    }
+
+    .title {
+      position: fixed;
+      top: 24px;
+      left: 28px;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    .title h1 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
+    }
+
+    .title p {
+      margin: 0;
+      font-size: 14px;
+      opacity: 0.8;
+    }
+
+    .info {
+      position: fixed;
+      left: 28px;
+      bottom: 28px;
+      z-index: 10;
+      max-width: 320px;
+      padding: 18px 20px;
+      border-radius: 14px;
+      background: rgba(3, 10, 25, 0.88);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .info h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .info p {
+      margin: 5px 0;
+      font-size: 14px;
+      line-height: 1.5;
+      opacity: 0.85;
+    }
+
+    .instructions {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      z-index: 10;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: rgba(3, 10, 25, 0.7);
+      font-size: 12px;
+      opacity: 0.75;
+    }
+
+    @media (max-width: 600px) {
+      .title {
+        top: 16px;
+        left: 16px;
+      }
+
+      .title h1 {
+        font-size: 21px;
+      }
+
+      .info {
+        left: 16px;
+        bottom: 16px;
+        max-width: 280px;
+      }
+
+      .instructions {
+        display: none;
+      }
+    }
+  </style>
+
+  <script src="https://unpkg.com/globe.gl"></script>
+</head>
+
+<body>
+
+  <div class="title">
+    <h1>Global Organization</h1>
+    <p>Explore our community around the world</p>
+  </div>
+
+  <div id="globeViz"></div>
+
+  <div class="info" id="infoBox">
+    <h2>Explore the Globe</h2>
+    <p>Drag the globe to rotate it.</p>
+    <p>Click a location marker to view information.</p>
+  </div>
+
+  <div class="instructions">
+    Drag • Scroll to zoom • Click a marker
+  </div>
+
+  <script>
+    const locations = [
+      {
+        lat: 33.7490,
+        lng: -84.3880,
+        city: "Atlanta",
+        state: "Georgia",
+        country: "United States",
+        members: 12
+      },
+      {
+        lat: 35.2271,
+        lng: -80.8431,
+        city: "Charlotte",
+        state: "North Carolina",
+        country: "United States",
+        members: 8
+      },
+      {
+        lat: 40.7128,
+        lng: -74.0060,
+        city: "New York",
+        state: "New York",
+        country: "United States",
+        members: 15
+      },
+      {
+        lat: 51.5074,
+        lng: -0.1278,
+        city: "London",
+        state: "",
+        country: "United Kingdom",
+        members: 9
+      },
+      {
+        lat: 6.5244,
+        lng: 3.3792,
+        city: "Lagos",
+        state: "",
+        country: "Nigeria",
+        members: 7
+      },
+      {
+        lat: 5.6037,
+        lng: -0.1870,
+        city: "Accra",
+        state: "",
+        country: "Ghana",
+        members: 6
+      },
+      {
+        lat: 43.6532,
+        lng: -79.3832,
+        city: "Toronto",
+        state: "Ontario",
+        country: "Canada",
+        members: 5
+      },
+      {
+        lat: -33.8688,
+        lng: 151.2093,
+        city: "Sydney",
+        state: "New South Wales",
+        country: "Australia",
+        members: 4
+      }
+    ];
+
+    const globe = Globe()
+      (document.getElementById("globeViz"))
+      .globeImageUrl(
+        "https://unpkg.com/three-globe/example/img/earth-night.jpg"
+      )
+      .backgroundImageUrl(
+        "https://unpkg.com/three-globe/example/img/night-sky.png"
+      )
+      .showAtmosphere(true)
+      .atmosphereColor("#4da6ff")
+      .atmosphereAltitude(0.15)
+      .pointsData(locations)
+      .pointLat("lat")
+      .pointLng("lng")
+      .pointAltitude(0.02)
+      .pointRadius(0.45)
+      .pointColor(() => "#00ff88")
+      .pointLabel(d => `
+        <div style="
+          padding: 8px 10px;
+          background: rgba(0,0,0,.85);
+          color: white;
+          border-radius: 8px;
+          font-family: Arial;
+        ">
+          <strong>${d.city}, ${d.state || d.country}</strong><br>
+          ${d.country}
+        </div>
+      `)
+      .onPointClick(d => {
+        const stateText = d.state ? `${d.state}, ` : "";
+
+        document.getElementById("infoBox").innerHTML = `
+          <h2>${d.city}</h2>
+          <p>${stateText}${d.country}</p>
+          <p><strong>Sample members:</strong> ${d.members}</p>
+        `;
+      });
+
+    // Start with North America generally facing the viewer.
+    globe.pointOfView({
+      lat: 25,
+      lng: -40,
+      altitude: 2.2
+    });
+
+    // Slowly rotate the globe when the user isn't interacting with it.
+    let rotating = true;
+
+    const controls = globe.controls();
+
+    controls.addEventListener("start", () => {
+      rotating = false;
+    });
+
+    controls.addEventListener("end", () => {
+      setTimeout(() => {
+        rotating = true;
+      }, 1500);
+    });
+
+    function animate() {
+      if (rotating) {
+        const current = globe.pointOfView();
+        globe.pointOfView({
+          lat: current.lat,
+          lng: current.lng + 0.03,
+          altitude: current.altitude
+        });
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+
+</body>
+</html>
